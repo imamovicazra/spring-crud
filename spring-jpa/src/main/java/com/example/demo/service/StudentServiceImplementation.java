@@ -37,4 +37,30 @@ public class StudentServiceImplementation implements StudentService{
 
         return dbStudentOptional.map(studentMapper::mapToApi);
     }
+
+    @Override
+    public void insertStudent(StudentDTO student) {
+        Student studentToAdd=new Student(student.getFirstName(),student.getLastName(),student.getEmail(),student.getAge());
+        studentRepository.save(studentToAdd);
+    }
+
+    @Override
+    public void updateStudent(Long id, StudentDTO studentDto) {
+        Optional<Student> optionalStudent = studentRepository.findById(id);
+
+        if (optionalStudent.isPresent()) {
+            // Student with the given ID exists, so we can update it
+            Student existingStudent = optionalStudent.get();
+            existingStudent.setFirstName(studentDto.getFirstName());
+            existingStudent.setLastName(studentDto.getLastName());
+            existingStudent.setEmail(studentDto.getEmail());
+            existingStudent.setAge(studentDto.getAge());
+            studentRepository.save(existingStudent);
+        }
+    }
+
+    @Override
+    public void deleteStudent(Long id) {
+        studentRepository.deleteById(id);
+    }
 }
