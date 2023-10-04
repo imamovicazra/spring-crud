@@ -4,6 +4,7 @@ import com.example.demo.api.StudentController;
 import com.example.demo.dto.StudentDTO;
 import com.example.demo.model.Student;
 import com.example.demo.service.StudentService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.*;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.Mockito.when;
 
 
 @ExtendWith(SpringExtension.class)
@@ -52,6 +53,40 @@ public class StudentControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void addStudent_success() throws Exception {
+        StudentDTO studentDTO = new StudentDTO("John", "Doe", "john@example.com", 25);
+
+        doNothing().when(studentService).insertStudent(studentDTO);
+
+        mockMvc.perform(post("/api/v1/student")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(studentDTO)))
+                .andExpect(status().isOk());
+    }
+    @Test
+    public void updateStudent_success() throws Exception {
+        Long studentId = 1L;
+        StudentDTO updatedStudentDTO = new StudentDTO("Updated", "Student", "updated@example.com", 30);
+
+        doNothing().when(studentService).updateStudent(studentId, updatedStudentDTO);
+
+        mockMvc.perform(put("/api/v1/student/{id}", studentId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(asJsonString(updatedStudentDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void deleteStudent_success() throws Exception {
+        Long studentId = 1L;
+
+        doNothing().when(studentService).deleteStudent(studentId);
+
+        mockMvc.perform(delete("/api/v1/student/{id}", studentId))
+                .andExpect(status().isOk());
+
+    }
     private Optional<StudentDTO> getMockedStudent()
     {
        return Optional.of(new StudentDTO("John", "Doe", "email@gmail.com", 23));
@@ -67,5 +102,9 @@ public class StudentControllerTest {
         return studentDTOS;
     }
 
-
+    // Helper method to convert an object to JSON string
+    private String asJsonString(Object obj) throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        return objectMapper.writeValueAsString(obj);
+    }
 }
