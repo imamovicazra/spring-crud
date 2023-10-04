@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import com.example.demo.api.StudentController;
 import com.example.demo.dto.StudentDTO;
+import com.example.demo.model.Student;
 import com.example.demo.service.StudentService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,21 @@ public class StudentControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @Test
+    public void getStudent_success() throws Exception {
+
+
+        when(studentService.getStudent(1L)).thenReturn(getMockedStudent());
+        mockMvc.perform(get("/api/v1/student/" + "1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    private Optional<StudentDTO> getMockedStudent()
+    {
+       return Optional.of(new StudentDTO("John", "Doe", "email@gmail.com", 23));
+    }
 
     private List<StudentDTO> getMockedStudents() {
         List<StudentDTO> studentDTOS= new ArrayList<>();
